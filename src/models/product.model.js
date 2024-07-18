@@ -11,7 +11,7 @@ const productSchema = new Schema({
         required: true,
     },
     cat_id: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Category"
     },
     image: {
