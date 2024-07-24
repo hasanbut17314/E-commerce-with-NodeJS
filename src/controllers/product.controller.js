@@ -2,7 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js"
 import { Product } from "../models/product.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
-import uploadOnCloudinary from "../utils/cloudinary.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 const addProduct = asyncHandler(async (req, res) => {
 
@@ -18,7 +18,17 @@ const addProduct = asyncHandler(async (req, res) => {
     {
         imageLocalPath = req.files.image[0].path
     }
-    let prodImage = await uploadOnCloudinary(imageLocalPath)
+    
+    let prodImage;
+    if (imageLocalPath) {
+        try {
+            prodImage = await uploadOnCloudinary(imageLocalPath);
+        } catch (error) {
+            throw new ApiError(500, "Image upload failed");
+        }
+    } else {
+        prodImage = { url: "" };
+    }
 
     const product = await Product.create({
         title,
