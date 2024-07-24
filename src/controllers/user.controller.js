@@ -3,7 +3,6 @@ import { User } from "../models/user.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt"
 
 const options = {
     httpOnly: true,
