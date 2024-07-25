@@ -1,6 +1,5 @@
 import asyncHandler from "../utils/asyncHandler.js"
 import { Product } from "../models/product.model.js"
-import { Category } from "../models/category.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
@@ -201,11 +200,54 @@ const deleteProduct = asyncHandler(async (req, res) => {
     )
 })
 
+const searchProducts = asyncHandler(async (req, res) => {
+    const { searchTerm, page = 1, limit = 10 } = req.query
+
+    const regex = new RegExp(searchTerm, 'i')
+    const pageNumber = parseInt(page)
+    const limitNumber = parseInt(limit)
+
+    const products = await Product.find({
+        $or: [
+            { title: regex },
+            { description: regex },
+        ],
+    })
+    .skip((pageNumber - 1) * limitNumber)
+    .limit(limitNumber)
+
+    const totalProducts = await Product.countDocuments({
+        $or: [
+            { title: regex },
+            { description: regex },
+        ],
+    })
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                products,
+                pagination: {
+                    total: totalProducts,
+                    page: pageNumber,
+                    pages: Math.ceil(totalProducts / limitNumber),
+                },
+            },
+            "Products fetched successfully"
+        )
+    )
+})
+
+
 export {
     addProduct,
     updateProduct,
     getAllProducts,
     productById,
     productByCateId,
-    deleteProduct
+    deleteProduct,
+    searchProducts
 }
