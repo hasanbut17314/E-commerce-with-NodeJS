@@ -1,4 +1,4 @@
-import mongoose, {Schema, mongo} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const itemSchema = new Schema({
     prod_id: {
@@ -29,7 +29,7 @@ const cartSchema = new Schema({
     }
 })
 
-cartSchema.pre("save", function(next) {
+cartSchema.pre("save", function (next) {
     this.total_price = this.prod_items.reduce((total, item) => total + item.quantity * item.price, 0);
     next();
 })
