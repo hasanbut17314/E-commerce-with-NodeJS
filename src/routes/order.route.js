@@ -5,11 +5,12 @@ import {
     updateOrderStatus,
     deleteOrder
 } from "../controllers/order.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const router = Router();
 
-router.route("/createOrder").post(createOrder);
-router.route("/getOrder").get(getOrder);
+router.route("/createOrder").post(verifyJWT, createOrder);
+router.route("/getOrder").get(verifyJWT, getOrder);
 router.route("/updateOrderStatus").post(updateOrderStatus);
 router.route("/deleteOrder").post(deleteOrder);
 
