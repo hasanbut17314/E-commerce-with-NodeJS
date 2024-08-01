@@ -32,6 +32,10 @@ const productSchema = new Schema({
         required: true,
         enum: ["Hidden", "Active"],
         default: "Active"
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
     }
 }, {timestamps: true})
 

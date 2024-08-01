@@ -6,9 +6,9 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const addProduct = asyncHandler(async (req, res) => {
 
-    const { title, description, cat_id, quantity, price } = req.body
+    const { title, description, cat_id, quantity, price, isFeatured } = req.body
     if (
-        [title, description, cat_id, quantity, price].some((field) => field?.trim() === "")
+        [title, description, cat_id, quantity, price, isFeatured].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All fields are required")
     }
@@ -35,6 +35,7 @@ const addProduct = asyncHandler(async (req, res) => {
         cat_id,
         quantity,
         price,
+        isFeatured,
         image: prodImage.url || ""
     })
 
@@ -58,9 +59,9 @@ const addProduct = asyncHandler(async (req, res) => {
 
 const updateProduct = asyncHandler(async (req, res) => {
 
-    const { title, description, cat_id, quantity, price } = req.body
+    const { title, description, cat_id, quantity, price, isFeatured } = req.body
     if (
-        [title, description, cat_id, quantity, price].some((field) => field?.trim() === "")
+        [title, description, cat_id, quantity, price, isFeatured].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "All fields are required")
     }
@@ -76,6 +77,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.cat_id = cat_id
     product.quantity = quantity
     product.price = price
+    product.isFeatured = isFeatured
 
     if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) {
         let imageLocalPath = req.files.image[0].path
