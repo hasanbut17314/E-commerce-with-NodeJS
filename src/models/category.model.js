@@ -9,6 +9,11 @@ const categorySchema = new Schema({
         type: String,
         required: true
     },
+    status: {
+        type: String,
+        enum: ["Active", "Hidden"],
+        default: "Active"
+    },
     image: {
         type: String
     }

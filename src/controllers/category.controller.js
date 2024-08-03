@@ -6,9 +6,13 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 const addCategory = asyncHandler(async (req, res) => {
 
-    const {title, description} = req.body
+    const {title, description, status} = req.body
     if(!title || !description) {
         throw new ApiError(400, "All fields are required")
+    }
+
+    if(status !== "Active" && status !== "Hidden") {
+        throw new ApiError(400, "Status must be Active or Hidden")
     }
 
     let imageLocalPath;
@@ -30,6 +34,7 @@ const addCategory = asyncHandler(async (req, res) => {
     const category = await Category.create({
         title,
         description,
+        status,
         image: catImage.url || ""
     })
 
@@ -46,9 +51,13 @@ const addCategory = asyncHandler(async (req, res) => {
 
 const updateCategory = asyncHandler(async (req, res) => {
 
-    const {title, description} = req.body
+    const {title, description, status} = req.body
     if(!title || !description) {
         throw new ApiError(400, "All fields are required")
+    }
+
+    if(status !== "Active" && status !== "Hidden") {
+        throw new ApiError(400, "Status must be Active or Hidden")
     }
 
     const category = await Category.findById(req.params.id)
@@ -59,6 +68,7 @@ const updateCategory = asyncHandler(async (req, res) => {
 
     category.title = title
     category.description = description
+    category.status = status
 
     if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) {
         let imageLocalPath = req.files.image[0].path
