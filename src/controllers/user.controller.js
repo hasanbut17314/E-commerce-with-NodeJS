@@ -28,7 +28,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 const registerController = asyncHandler(async (req, res) => {
 
-    const { username, email, password, confirmPassword } = req.body
+    const { username, email, password, confirmPassword, role } = req.body
     if (
         [username, email, password, confirmPassword].some((field) => field?.trim() === "")
     ) {
@@ -50,7 +50,8 @@ const registerController = asyncHandler(async (req, res) => {
     const user = await User.create({
         username,
         email,
-        password
+        password,
+        role: role || "user"
     })
 
     const createdUser = await User.findById(user._id).select(
@@ -215,7 +216,7 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 })
 
 const changeUserDetails = asyncHandler(async (req, res) => {
-    const { username, email } = req.body
+    const { username, email, role } = req.body
     if (!username || !email) {
         throw new ApiError(400, "username and email are required")
     }
@@ -225,7 +226,8 @@ const changeUserDetails = asyncHandler(async (req, res) => {
         {
             $set: {
                 username,
-                email   
+                email,
+                role: role || "user"   
             }
         },
         {
