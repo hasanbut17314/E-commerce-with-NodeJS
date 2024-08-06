@@ -94,7 +94,7 @@ const loginController = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid Password! Try Again")
     }
 
-    const { refreshToken, accessToken } = generateAccessAndRefereshTokens(user._id)
+    const { refreshToken, accessToken } = await generateAccessAndRefereshTokens(user._id)
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
@@ -106,7 +106,9 @@ const loginController = asyncHandler(async (req, res) => {
             new ApiResponse(
                 200,
                 {
-                    user: loggedInUser, accessToken, refreshToken
+                    user: loggedInUser,
+                    accessToken,
+                    refreshToken
                 },
                 "User Logged In Successfully"
             )
