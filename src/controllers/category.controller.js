@@ -16,9 +16,9 @@ const addCategory = asyncHandler(async (req, res) => {
     }
 
     let imageLocalPath;
-    if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) 
+    if (req.file) 
     {
-        imageLocalPath = req.files.image[0].path
+        imageLocalPath = req.file.path
     }
     let catImage;
     if (imageLocalPath) {
@@ -70,8 +70,8 @@ const updateCategory = asyncHandler(async (req, res) => {
     category.description = description
     category.status = status
 
-    if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) {
-        let imageLocalPath = req.files.image[0].path
+    if (req.file) {
+        let imageLocalPath = req.file.path
         try {
             const catImage = await uploadOnCloudinary(imageLocalPath)
             category.image = catImage.url
