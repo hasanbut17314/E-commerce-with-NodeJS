@@ -116,13 +116,29 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
 const getAllCategories = asyncHandler(async (req, res) => {
 
+    const { limit = 15, page = 1 } = req.query
+    const pageNumber = parseInt(page)
+    const limitNumber = parseInt(limit)
+
     const categories = await Category.find()
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber)
+
+    const totalCategories = await Category.countDocuments()
+
     return res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            categories,
+            {
+                categories,
+                pagination: {
+                    page: pageNumber,
+                    total: totalCategories,
+                    pages: Math.ceil(totalCategories / limitNumber)
+                }
+            },
             "Categories fetched successfully"
         )
     )
