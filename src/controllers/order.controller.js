@@ -142,9 +142,41 @@ const deleteOrder = asyncHandler(async (req, res) => {
     )
 })
 
+const getAllOrders = asyncHandler(async (req, res) => {
+    
+    const {limit = 15, page = 1} = req.query
+    const pageNumber = parseInt(page)
+    const limitNumber = parseInt(limit)
+
+    const orders = await Order.find()
+    .skip((pageNumber - 1) * limitNumber)
+    .limit(limitNumber)
+    .sort({createdAt: -1})
+    
+    const totalOrders = await Order.countDocuments()
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                orders,
+                pagination: {
+                    page: pageNumber,
+                    total: totalOrders,
+                    pages: Math.ceil(totalOrders / limitNumber)
+                }
+            },
+            "Orders fetched successfully"
+        )
+    )
+})
+
 export {
     createOrder,
     getOrder,
     updateOrderStatus,
-    deleteOrder
+    deleteOrder,
+    getAllOrders
 }

@@ -101,7 +101,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Category not found")
     }
 
-    await category.remove()
+    await Category.findByIdAndDelete(req.params.id)
 
     return res
     .status(200)
@@ -123,6 +123,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
     const categories = await Category.find()
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber)
+        .sort({createdAt: -1})
 
     const totalCategories = await Category.countDocuments()
 

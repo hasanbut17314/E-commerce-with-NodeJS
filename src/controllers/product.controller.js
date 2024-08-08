@@ -110,7 +110,8 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
     const products = await Product.find()
         .skip((pageNumber - 1) * limitNumber)
-        .limit(limitNumber);
+        .limit(limitNumber)
+        .sort({createdAt: -1})
     
     const totalProducts = await Product.countDocuments()
 
@@ -160,6 +161,7 @@ const productByCateId = asyncHandler(async (req, res) => {
     const products = await Product.find({ cat_id: req.params.id })
     .skip((pageNumber - 1) * limitNumber)
     .limit(limitNumber)
+    .sort({createdAt: -1})
 
     const totalProducts = await Product.countDocuments({ cat_id: req.params.id })
 
