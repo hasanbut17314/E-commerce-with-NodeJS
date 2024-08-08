@@ -14,8 +14,8 @@ const addProduct = asyncHandler(async (req, res) => {
     }
 
     let imageLocalPath;
-    if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) {
-        imageLocalPath = req.files.image[0].path
+    if (req.file) {
+        imageLocalPath = req.file.path
     }
 
     let prodImage;
@@ -79,8 +79,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.price = price
     product.isFeatured = isFeatured
 
-    if (req.files && Array.isArray(req.files.image) && req.files.image.length > 0) {
-        let imageLocalPath = req.files.image[0].path
+    if (req.file) {
+        let imageLocalPath = req.file.path
         try {
             const prodImage = await uploadOnCloudinary(imageLocalPath)
             product.image = prodImage.url
