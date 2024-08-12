@@ -193,7 +193,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Product not found")
     }
 
-    await product.remove()
+    await Product.findByIdAndDelete(req.params.id)
 
     return res
     .status(200)

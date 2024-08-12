@@ -242,6 +242,76 @@ const changeUserDetails = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, updatedUser, "User details updated successfully"))
 })
 
+const changeUserRole = asyncHandler(async (req, res) => {
+    const { role } = req.body
+    if (role !== "admin" && role !== "user") {
+        throw new ApiError(400, "role is required")
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            $set: {
+                role
+            }
+        },
+        {
+            new: true
+        }
+    ).select("-password")
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedUser, "User role updated successfully"))
+})
+
+const getAllUsers = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10 } = req.query
+    const pageNumber = parseInt(page)
+    const limitNumber = parseInt(limit)
+
+    const users = await User
+        .find()
+        .skip((pageNumber - 1) * limitNumber)
+        .limit(limitNumber)
+        .sort({createdAt: -1})
+        .select("-password")
+
+    const totalUsers = await User.countDocuments()
+    const totalPages = Math.ceil(totalUsers / limitNumber)
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    users,
+                    pagination: {
+                        page: pageNumber,
+                        total: totalUsers,
+                        pages: totalPages
+                    }
+                },
+                "Users fetched successfully"
+            )
+        )
+})
+
+const deleteUser = asyncHandler(async (req, res) => {
+
+    const user = await User.findById(req.params.id)
+
+    if(!user) {
+        throw new ApiError(404, "user not found")
+    }
+
+    await User.findByIdAndDelete(req.params.id)
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "User deleted successfully"))
+})
+
 export {
     registerController,
     loginController,
@@ -250,4 +320,7 @@ export {
     getUserDetails,
     changeUserDetails,
     changeUserPassword,
+    getAllUsers,
+    deleteUser,
+    changeUserRole
 }
