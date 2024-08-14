@@ -116,16 +116,21 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
 const getAllCategories = asyncHandler(async (req, res) => {
 
-    const { limit = 15, page = 1 } = req.query
+    const { limit = 15, page = 1, status } = req.query
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
-    const categories = await Category.find()
+    const query = {}
+    if(status) {
+        query.status = status
+    }
+
+    const categories = await Category.find(query)
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber)
         .sort({createdAt: -1})
 
-    const totalCategories = await Category.countDocuments()
+    const totalCategories = await Category.countDocuments(query)
 
     return res
     .status(200)

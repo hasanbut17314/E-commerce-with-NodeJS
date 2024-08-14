@@ -106,16 +106,21 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
 
-    const { limit = 15, page = 1 } = req.query
+    const { limit = 15, page = 1, status } = req.query
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
-    const products = await Product.find()
+    const query = {}
+    if(status) {
+        query.status = status
+    }
+
+    const products = await Product.find(query)
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber)
         .sort({createdAt: -1})
     
-    const totalProducts = await Product.countDocuments()
+    const totalProducts = await Product.countDocuments(query)
 
     return res
     .status(200)
@@ -156,16 +161,23 @@ const productById = asyncHandler(async (req, res) => {
 
 const productByCateId = asyncHandler(async (req, res) => {
 
-    const {limit = 15, page = 1} = req.query
+    const {limit = 15, page = 1, status} = req.query
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
-    const products = await Product.find({ cat_id: req.params.id })
+    const query = {
+        cat_id: req.params.id,
+    }
+    if(status) {
+        query.status = status
+    }
+
+    const products = await Product.find(query)
     .skip((pageNumber - 1) * limitNumber)
     .limit(limitNumber)
     .sort({createdAt: -1})
 
-    const totalProducts = await Product.countDocuments({ cat_id: req.params.id })
+    const totalProducts = await Product.countDocuments(query)
 
     return res
     .status(200)
@@ -207,27 +219,27 @@ const deleteProduct = asyncHandler(async (req, res) => {
 })
 
 const searchProducts = asyncHandler(async (req, res) => {
-    const { searchTerm, page = 1, limit = 10 } = req.query
+    const { searchTerm, page = 1, limit = 10, status } = req.query
 
     const regex = new RegExp(searchTerm, 'i')
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
-    const products = await Product.find({
+    const query = {
         $or: [
             { title: regex },
             { description: regex },
         ],
-    })
+    }
+    if (status) {
+        query.status = status
+    }
+
+    const products = await Product.find(query)
     .skip((pageNumber - 1) * limitNumber)
     .limit(limitNumber)
 
-    const totalProducts = await Product.countDocuments({
-        $or: [
-            { title: regex },
-            { description: regex },
-        ],
-    })
+    const totalProducts = await Product.countDocuments(query)
 
     return res
     .status(200)
