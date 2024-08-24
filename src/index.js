@@ -15,3 +15,7 @@ connectDB()
 .catch((error) => {
     console.log("DB connection failed! ", error);
 })
+
+app.get('/', (req, res) => {
+    res.send('Hello! Api is running!')
+})
