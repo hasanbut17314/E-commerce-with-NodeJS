@@ -106,13 +106,16 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 const getAllProducts = asyncHandler(async (req, res) => {
 
-    const { limit = 15, page = 1, status } = req.query
+    const { limit = 15, page = 1, status, isFeatured } = req.query
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
     const query = {}
     if(status) {
         query.status = status
+    }
+    if(isFeatured) {
+        query.isFeatured = isFeatured
     }
 
     const products = await Product.find(query)
