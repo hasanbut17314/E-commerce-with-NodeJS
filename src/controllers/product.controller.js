@@ -168,7 +168,7 @@ const productByCateId = asyncHandler(async (req, res) => {
     const pageNumber = parseInt(page)
     const limitNumber = parseInt(limit)
 
-    const query = {
+    let query = {
         cat_id: req.params.id,
     }
     if(status) {
