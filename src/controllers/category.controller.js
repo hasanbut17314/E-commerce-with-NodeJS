@@ -150,9 +150,29 @@ const getAllCategories = asyncHandler(async (req, res) => {
     )
 })
 
+const getCategoryById = asyncHandler(async (req, res) => {
+
+    const category = await Category.findById(req.params.id)
+
+    if(!category) {
+        throw new ApiError(404, "Category not found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            category,
+            "Category fetched successfully"
+        )
+    )
+})
+
 export {
     addCategory,
     updateCategory,
     deleteCategory,
-    getAllCategories
+    getAllCategories,
+    getCategoryById
 }
