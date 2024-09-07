@@ -24,8 +24,7 @@ const cartSchema = new Schema({
     },
     prod_items: [itemSchema],
     total_price: {
-        type: Number,
-        required: true
+        type: Number
     }
 })
 
