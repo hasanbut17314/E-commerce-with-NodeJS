@@ -37,7 +37,9 @@ const addToCart = asyncHandler(async (req, res) => {
         cart.prod_items.push({
             prod_id,
             quantity,
-            price: product.price
+            price: product.price,
+            title: product.title,
+            image: product.image
         })
     }
     await cart.save()
