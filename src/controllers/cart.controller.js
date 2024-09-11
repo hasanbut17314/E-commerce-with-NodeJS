@@ -98,12 +98,17 @@ const getCart = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Cart not found")
     }
 
+    const totalCartItems = cart.prod_items.length
+
     return res
     .status(200)
     .json(
         new ApiResponse(
             200,
-            cart,
+            {
+                cart,
+                total: totalCartItems
+            },
             "Cart fetched successfully"
         )
     )
