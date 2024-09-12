@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js"
 import { User } from "../models/user.model.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import ApiError from "../utils/ApiError.js"
+import sendVerificationEmail from "../utils/email.js"
 import jwt from "jsonwebtoken";
 
 const options = {
@@ -23,6 +24,21 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
+    }
+}
+
+const generateVerificationToken = async (userId) => {
+
+    try {
+        const user = await User.findById(userId)
+        const verificationToken = user.generateEmailVerificationToken()
+
+        user.verificationToken = verificationToken
+        await user.save({ validateBeforeSave: false })
+
+        return verificationToken
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating email verification token")
     }
 }
 
@@ -62,12 +78,45 @@ const registerController = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Something went wrong while storing user details")
     }
 
+    const verificationToken = await generateVerificationToken(createdUser._id)
+
+    const subject = "Email Verification"
+    const html = `<p>Click <a href="${process.env.CLIENT_URL}/verify-email/${verificationToken}">here</a> to verify your email.</p>
+    <p>If the link is not clickable, copy and paste the following URL into your browser:</p>
+    <p>${process.env.CLIENT_URL}/verify-email/${verificationToken}</p>`
+
+    await sendVerificationEmail(createdUser, subject, html)
+
     return res
         .status(200)
         .json(
             new ApiResponse(200, createdUser, "User registered Successfully")
         )
 
+})
+
+const verifyEmailController = asyncHandler(async (req, res) => {
+
+    const { verificationToken } = req.params
+    
+    const decodedToken = jwt.verify(verificationToken, process.env.VERIFICATION_TOKEN_SECRET)
+
+    const user = await User.findById(decodedToken._id)
+
+    if (!user) {
+        throw new ApiError(404, "user not found! Something is wrong with the verification token")
+    }
+
+    user.isEmailVerified = true
+    user.verificationToken = null
+
+    await user.save({ validateBeforeSave: false })
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, {}, "Email verified successfully")
+        )
 })
 
 const loginController = asyncHandler(async (req, res) => {
@@ -181,30 +230,30 @@ const reCreateAccessToken = asyncHandler(async (req, res) => {
 
 const getUserDetails = asyncHandler(async (req, res) => {
     return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            req.user,
-            "User details fetched successfully"
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                req.user,
+                "User details fetched successfully"
+            )
         )
-    )
 })
 
 const changeUserPassword = asyncHandler(async (req, res) => {
 
-    const {newPassword, oldPassword} = req.body
-    if(!newPassword || !oldPassword) {
+    const { newPassword, oldPassword } = req.body
+    if (!newPassword || !oldPassword) {
         throw new ApiError(400, "new password and old password is required")
     }
 
     const user = await User.findById(req.user._id)
-    if(!user) {
+    if (!user) {
         throw new ApiError(404, "user not found")
     }
 
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-    if(!isPasswordCorrect) {
+    if (!isPasswordCorrect) {
         throw new ApiError(400, "old password is incorrect")
     }
 
@@ -212,9 +261,9 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "password changed successfully"))
-    
+        .status(200)
+        .json(new ApiResponse(200, {}, "password changed successfully"))
+
 })
 
 const changeUserDetails = asyncHandler(async (req, res) => {
@@ -229,7 +278,7 @@ const changeUserDetails = asyncHandler(async (req, res) => {
             $set: {
                 username,
                 email,
-                role: role || "user"   
+                role: role || "user"
             }
         },
         {
@@ -274,7 +323,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
         .find()
         .skip((pageNumber - 1) * limitNumber)
         .limit(limitNumber)
-        .sort({createdAt: -1})
+        .sort({ createdAt: -1 })
         .select("-password")
 
     const totalUsers = await User.countDocuments()
@@ -302,18 +351,19 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     const user = await User.findById(req.params.id)
 
-    if(!user) {
+    if (!user) {
         throw new ApiError(404, "user not found")
     }
 
     await User.findByIdAndDelete(req.params.id)
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "User deleted successfully"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "User deleted successfully"))
 })
 
 export {
     registerController,
+    verifyEmailController,
     loginController,
     logoutController,
     reCreateAccessToken,
