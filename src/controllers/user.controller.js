@@ -97,9 +97,9 @@ const registerController = asyncHandler(async (req, res) => {
 
 const verifyEmailController = asyncHandler(async (req, res) => {
 
-    const { verificationToken } = req.params
+    const { token } = req.params
     
-    const decodedToken = jwt.verify(verificationToken, process.env.VERIFICATION_TOKEN_SECRET)
+    const decodedToken = jwt.verify(token, process.env.VERIFICATION_TOKEN_SECRET)
 
     const user = await User.findById(decodedToken._id)
 
