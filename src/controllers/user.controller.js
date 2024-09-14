@@ -138,6 +138,10 @@ const loginController = asyncHandler(async (req, res) => {
         throw new ApiError(404, "username or email not found")
     }
 
+    if(!user.isEmailVerified) {
+        throw new ApiError(402, "Please verify your email first")
+    }
+
     const validPassword = await user.isPasswordCorrect(password)
     if (!validPassword) {
         throw new ApiError(401, "Invalid Password! Try Again")
