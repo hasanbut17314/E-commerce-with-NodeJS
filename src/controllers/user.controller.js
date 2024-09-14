@@ -97,7 +97,7 @@ const registerController = asyncHandler(async (req, res) => {
 
 const verifyEmailController = asyncHandler(async (req, res) => {
 
-    const { verificationToken } = req.params
+    const verificationToken = req.params
     
     const decodedToken = jwt.verify(verificationToken, process.env.VERIFICATION_TOKEN_SECRET)
 
