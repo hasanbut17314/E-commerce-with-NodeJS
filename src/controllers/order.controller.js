@@ -4,6 +4,7 @@ import ApiError from "../utils/ApiError.js"
 import { Order } from "../models/order.model.js"
 import { Cart } from "../models/cart.model.js"
 import { Product } from "../models/product.model.js"
+import Stripe from "stripe"
 
 const createOrder = asyncHandler(async (req, res) => {
 
@@ -40,7 +41,7 @@ const createOrder = asyncHandler(async (req, res) => {
         order_items
     })
     await order.save()
-    await cart.remove()
+    await Cart.deleteOne({ user_id: userId })
 
     return res
     .status(201)
@@ -173,10 +174,30 @@ const getAllOrders = asyncHandler(async (req, res) => {
     )
 })
 
+const stripePayment = asyncHandler(async (req, res) => {
+
+    const { amount } = req.body
+    if (!amount) {
+        throw new ApiError(400, "Amount is required")
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "usd",
+        payment_method_types: ["card"]
+    })
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, paymentIntent, "Payment intent created successfully"))
+})
+
 export {
     createOrder,
     getOrder,
     updateOrderStatus,
     deleteOrder,
-    getAllOrders
+    getAllOrders,
+    stripePayment
 }
