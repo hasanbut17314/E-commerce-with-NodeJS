@@ -174,25 +174,6 @@ const getAllOrders = asyncHandler(async (req, res) => {
     )
 })
 
-const stripePayment = asyncHandler(async (req, res) => {
-
-    const { amount } = req.body
-    if (!amount) {
-        throw new ApiError(400, "Amount is required")
-    }
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-    const paymentIntent = await stripe.paymentIntents.create({
-        amount,
-        currency: "usd",
-        payment_method_types: ["card"]
-    })
-
-    return res
-    .status(200)
-    .json(new ApiResponse(200, paymentIntent, "Payment intent created successfully"))
-})
-
 export {
     createOrder,
     getOrder,
