@@ -4,7 +4,6 @@ import ApiError from "../utils/ApiError.js"
 import { Order } from "../models/order.model.js"
 import { Cart } from "../models/cart.model.js"
 import { Product } from "../models/product.model.js"
-import Stripe from "stripe"
 
 const createOrder = asyncHandler(async (req, res) => {
 
@@ -179,6 +178,5 @@ export {
     getOrder,
     updateOrderStatus,
     deleteOrder,
-    getAllOrders,
-    stripePayment
+    getAllOrders
 }

@@ -4,7 +4,7 @@ import {
     getOrder,
     updateOrderStatus,
     deleteOrder,
-    getAllOrders,
+    getAllOrders
 } from "../controllers/order.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 
