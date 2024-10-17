@@ -219,13 +219,12 @@ const reCreateAccessToken = asyncHandler(async (req, res) => {
             .status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", newRefreshToken, options)
-            .json(
-                new ApiResponse(
-                    200,
-                    { accessToken, refreshToken: newRefreshToken },
-                    "Access token refreshed"
-                )
-            )
+            .json({
+                statusCode: 200,
+                accessToken,
+                refreshToken: newRefreshToken,
+                message: "Access token created successfully"
+            })
     } catch (error) {
         throw new ApiError(401, error?.message || "Invalid refresh token")
     }
